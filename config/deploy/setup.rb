@@ -1,7 +1,7 @@
 role :servers, "xxx.xxx.xxx.1:49163","xxx.xxx.xxx.1:49164"
 #
 set :user, "root"
-set :path_to, "/home/kappa"
+set :path_to, ""
 #
 set :chef_local_dir, "#{path_to}/chef-repo"
 set :chef_remote_dir, "/root/chef"
@@ -13,8 +13,9 @@ namespace :chef do
     run "mkdir -p #{chef_remote_dir}/chef-repo/"
     find_servers_for_task(current_task).each do |server|
       if server.include?(":")
-        sv =
-        port = 
+        arr = server.split(":")
+        sv = arr[0] 
+        port = arr[1]
         `rsync -avz #{chef_local_dir}/ -e "ssh -p #{port}" root@#{sv}:#{chef_remote_dir}/chef-repo/`
       else
         `rsync -avz #{chef_local_dir}/ root@#{server}:#{chef_remote_dir}/chef-repo/`
