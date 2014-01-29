@@ -1,10 +1,10 @@
 role :servers, "",""
 #
-set :user, "root"
+set :user, ""
 set :path_to, ""
 #
 set :chef_local_dir, "#{path_to}/chef-repo"
-set :chef_remote_dir, "/root/chef"
+set :chef_remote_dir, ""
 #
 namespace :chef do
   task :init, :roles => :servers do
@@ -15,9 +15,9 @@ namespace :chef do
     run "mkdir -p #{chef_remote_dir}/chef-repo/"
     find_servers_for_task(current_task).each do |server|
       if ( "#{server.port}" == nil )
-        `rsync -avz #{chef_local_dir}/ -e "ssh -p #{server.port}" root@#{server.host}:#{chef_remote_dir}/chef-repo/`
+        `rsync -avz #{chef_local_dir}/ -e "ssh -p #{server.port}" #{user}@#{server.host}:#{chef_remote_dir}/chef-repo/`
       else
-        `rsync -avz #{chef_local_dir}/ root@#{server.host}:#{chef_remote_dir}/chef-repo/`
+        `rsync -avz #{chef_local_dir}/ #{user}@#{server.host}:#{chef_remote_dir}/chef-repo/`
       end
     end
   end
