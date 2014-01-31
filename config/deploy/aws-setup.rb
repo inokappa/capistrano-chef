@@ -1,30 +1,36 @@
 require 'aws-sdk'
 require 'yaml'
-
+# Please set AWS access_key and secret_access_key and region.
 config = YAML.load(File.read("config/deploy/config.yml"))
 AWS.config(config)
 #
-servers = AWS.ec2.instances.select {|i| i.tags[:Name] == 'hogehuga-kawahara' && i.status == :running}.map(&:dns_name)
-role :servers, *servers
 set :local_home, ENV['HOME']
 set :remote_home, "/tmp"
 set :chef_local_dir, "#{local_home}/git/myrepo/chef-repo"
 set :chef_remote_dir, "#{remote_home}/chef"
-set :user, "ec2-user"
-set :key, "####path/to/key"
-set :ami, "####plase set ami"
+set :user, "#### please set ssh user (ex ec2-user"
+set :key, "#### please set ssh-key path (ex path/to/key"
+set :ami, "#### plase set ami"
+set :instance_type, "#### please set instance type (ex t1.micro"
+set :vpc_subnet, "#### please set vpc's subnet"
+set :security_group, "#### please set security group id"
+set :key_name, "#### please set key name"
+set :tag_name, "#### please set tag's value name"
+#
+servers = AWS.ec2.instances.select {|i| i.tags[:Name] == "#{tag_name}" && i.status == :running}.map(&:dns_name)
+role :servers, *servers
 #
 namespace :ec2 do
   desc "Launch EC2 instances."
   task :launch do
     inst = AWS.ec2.instances.create({
       :image_id => "#{ami}",
-      :instance_type => "t1.micro",
-      :subnet => "",
-      :security_group_ids => "",
-      :key_name => "",
+      :instance_type => "#{instance_type}",
+      :subnet => "#{vpc_subnet}",
+      :security_group_ids => "#{security_group}",
+      :key_name => "#{key_name}",
     })
-    AWS.ec2.tags.create(inst, 'Name',:value => 'hogehuga-kawahara')
+    AWS.ec2.tags.create(inst, 'Name',:value => "#{tag_name}")
   end
   task :status do
     puts "#{servers}"
