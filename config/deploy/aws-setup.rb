@@ -6,7 +6,7 @@ AWS.config(config)
 #
 set :local_home, ENV['HOME']
 set :remote_home, "/tmp"
-set :chef_local_dir, "#{local_home}/git/myrepo/chef-repo"
+set :chef_local_dir, "#{local_home}/chef-repo"
 set :chef_remote_dir, "#{remote_home}/chef"
 set :user, "#### please set ssh user (ex ec2-user"
 set :key, "#### please set ssh-key path (ex path/to/key"
