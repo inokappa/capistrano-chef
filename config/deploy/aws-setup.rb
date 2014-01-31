@@ -55,7 +55,7 @@ namespace :chef do
   end
   task :deploy, :roles => :servers do
     find_servers_for_task(current_task).each do |server|
-      run "#{sudo} chef-solo -j #{chef_remote_dir}/chef-repo/nodes/localhost.json -c #{chef_remote_dir}/chef-repo/solo.rb"
+      run "#{try_sudo} chef-solo -j #{chef_remote_dir}/chef-repo/nodes/localhost.json -c #{chef_remote_dir}/chef-repo/solo.rb"
     end
   end
 end
