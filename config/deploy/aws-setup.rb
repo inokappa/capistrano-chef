@@ -39,8 +39,9 @@ end
 #
 namespace :chef do
   task :init, :roles => :servers do
-    #run "apt-get update && apt-get -y install sudo curl rsync"
-    run "curl -L https://www.opscode.com/chef/install.sh | sudo bash"
+    run "#{try_sudo} apt-get update"
+    run "#{try_sudo} apt-get -y install sudo curl rsync"
+    run "#{try_sudo} curl -L https://www.opscode.com/chef/install.sh | sudo bash"
   end
   task :sync, :roles => :servers do
     run "mkdir -p #{chef_remote_dir}/chef-repo/"
