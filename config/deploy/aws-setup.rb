@@ -8,14 +8,14 @@ set :local_home, ENV['HOME']
 set :remote_home, "/tmp"
 set :chef_local_dir, "#{local_home}/chef-repo"
 set :chef_remote_dir, "#{remote_home}/chef"
-set :user, "#### please set ssh user (ex ec2-user"
-set :key, "#### please set ssh-key path (ex path/to/key"
-set :ami, "#### plase set ami"
-set :instance_type, "#### please set instance type (ex t1.micro"
-set :vpc_subnet, "#### please set vpc's subnet"
-set :security_group, "#### please set security group id"
-set :key_name, "#### please set key name"
-set :tag_name, "#### please set tag's value name"
+set :user, ""
+set :key, ""
+set :ami, ""
+set :instance_type, ""
+set :vpc_subnet, ""
+set :security_group, ""
+set :key_name, ""
+set :tag_name, ""
 #
 servers = AWS.ec2.instances.select {|i| i.tags[:Name] == "#{tag_name}" && i.status == :running}.map(&:dns_name)
 role :servers, *servers
@@ -32,8 +32,21 @@ namespace :ec2 do
     })
     AWS.ec2.tags.create(inst, 'Name',:value => "#{tag_name}")
   end
-  task :status do
-    puts "#{servers}"
+  task :listall do
+    lists = AWS.ec2.instances
+    lists.each do |list|
+      puts [ "instance_id" => list.instance_id , "dns_name" => list.dns_name , "tag_name" => list.tags[:Name] ]
+    end
+  end
+  task :list do
+    lists = AWS.ec2.instances.select {|i| i.status == :running}
+    lists.each do |list|
+      puts [ "instance_id" => list.instance_id , "dns_name" => list.dns_name , "tag_name" => list.tags[:Name] ]
+    end
+  end
+  task :settag do
+    id = AWS.ec2.instances.select {|i| i.tags[:Name] == "#{tag_name}" && i.status == :running && i.dns_name == "#{_set_host}"}
+    AWS.ec2.tags.create(id[0], 'Name',:value => "#{_set_tag}")
   end
 end
 #
